@@ -36,7 +36,12 @@ const gameList = [
 	},
 ]
 
+/*  DOM ELEMENTS */
 const cardContainer = document.querySelector(".row")
+/* modal */
+const modalTitle = document.querySelector(".modal-title")
+const modalBody = document.querySelector(".modal-body")
+const modalFooter = document.querySelector(".modal-footer")
 
 gameList.forEach((game) => {
 	cardContainer.innerHTML += `
@@ -49,7 +54,7 @@ gameList.forEach((game) => {
                   <div class="btn-group">
                         <button
                             type="button"
-                            class="btn btn-sm btn-outline-secondary"
+                            class="btn btn-sm btn-outline-secondary view"
                             data-bs-toggle="modal"
                             data-bs-target="#gameModal"
                         >
@@ -57,7 +62,7 @@ gameList.forEach((game) => {
                         </button>
                         <button
                             type="button"
-                            class="btn btn-sm btn-outline-secondary"
+                            class="btn btn-sm btn-outline-secondary edit"
                             data-bs-toggle="modal"
                             data-bs-target="#gameModal"
                         >
@@ -68,4 +73,109 @@ gameList.forEach((game) => {
             </article>
         </div>
     `
+})
+
+const viewBtns = document.querySelectorAll(".view")
+const editBtns = document.querySelectorAll(".edit")
+
+viewBtns.forEach((btn, i) => {
+	btn.addEventListener("click", () => {
+		modalTitle.innerHTML = gameList[i].title
+		modalBody.innerHTML = `
+            <img class="img-fluid" src="${gameList[i].imageUrl}" alt="${gameList[i].title}" >
+        `
+		modalBody.innerHTML += `<p class="mt-2">Year: ${gameList[i].year}</p>`
+
+		modalFooter.innerHTML = `
+            <button
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal"
+            >
+                Close
+            </button>
+        `
+	})
+})
+
+editBtns.forEach((btn, i) => {
+	btn.addEventListener("click", () => {
+		modalTitle.innerHTML = "Edit mode !"
+
+		modalBody.innerHTML = `
+            <form>
+                <div class="mb-3">
+                    <label for="title" class="form-label">Title</label>
+                    <input type="text" class="form-control" id="title" value="${gameList[i].title}" >
+                </div>
+
+                <div class="mb-3">
+                    <label for="year" class="form-label">Year</label>
+                    <input type="number" autocomplete="off" class="form-control" id="year" value="${gameList[i].year}" >
+                </div>
+
+                 <div class="mb-3">
+                    <label for="year" class="form-label">Year</label>
+                    <input type="text" autocomplete="off" class="form-control" id="imageUrl" value="${gameList[i].imageUrl}" >
+                    <img class="img-thumbnail mt-2 w-50" src="${gameList[i].imageUrl}"  >
+                
+                </div>                             
+        
+        `
+
+		modalFooter.innerHTML = `
+            <button
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal">
+                Close
+            </button>
+            <button
+                type="submit"
+                class="btn btn-primary submit"
+                data-bs-dismiss="modal">
+                Save changes
+            </button>
+
+            </form>
+        `
+
+		const submitBtn = document.querySelector(".submit")
+
+		/*  submit btn click  */
+		submitBtn.addEventListener("click", () => {
+			const formTitle = document.querySelector("form").title.value
+			const formYear = document.querySelector("form").year.value
+			const formImageUrl = document.querySelector("form").imageUrl.value
+
+			/*  form validation */
+			// emptinness
+			if (formTitle === "" || formYear === "" || formImageUrl === "") {
+				alert("Values cannot be empty!")
+				return
+			}
+
+			const alphanumericRegex = /^[a-zA-Z0-9/.:-_ 'éùçà(),-=?&]+$/
+			/* alphanumeric test */
+			if (
+				!alphanumericRegex.test(formTitle) ||
+				!alphanumericRegex.test(formYear) ||
+				!alphanumericRegex.test(formImageUrl)
+			) {
+				alert("No weird characters !!")
+				return
+			}
+
+			gameList[i].title = formTitle
+			gameList[i].year = formYear
+			gameList[i].imageUrl = formImageUrl
+
+			/*  select card  */
+			document.querySelectorAll(".card-title")[i].innerHTML = gameList[i].title
+			document.querySelectorAll(".card-text")[
+				i
+			].innerHTML = `Year: ${gameList[i].year}`
+			document.querySelectorAll(".card-img-top")[i].src = gameList[i].imageUrl
+		})
+	})
 })
